@@ -1,9 +1,11 @@
 package com.leezy.meet.dao;
 
+import com.leezy.meet.model.Meeting;
 import com.leezy.meet.model.User;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,5 +21,11 @@ public interface UserDao {
 
     User login(@Param("userName") String userName, @Param("userPwd") String userPwd);
 
-    List<User> selectAllUser();
+    User adminLogin(@Param("userName") String userName, @Param("userPwd") String userPwd);
+
+    List<User> userList();
+    Boolean updateUser(@Param("user") User user);
+    Boolean delUser(@Param("id") Long id);
+    Boolean addUser(@Param("user") User user);
+    List<Meeting> getNewMeetings(@Param("nowtime") Date nowtime);
 }

@@ -10,6 +10,7 @@ public class User {
     private String userEmail;
     private String userPwd;
     private Short isDelete;
+    private Short isAdmin;
 
     public Long getId() {
         return id;
@@ -57,5 +58,13 @@ public class User {
 
     public void setIsDelete(Short isDelete) {
         this.isDelete = isDelete;
+    }
+
+    public Short getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Short isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

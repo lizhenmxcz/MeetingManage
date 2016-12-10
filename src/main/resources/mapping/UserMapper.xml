@@ -9,6 +9,7 @@
         <result column="user_email" property="userEmail" jdbcType="VARCHAR"/>
         <result column="user_pwd" property="userPwd" jdbcType="VARCHAR"/>
         <result column="is_delete" property="isDelete" jdbcType="SMALLINT"></result>
+        <result column="is_admin" property="isAdmin" jdbcType="SMALLINT"></result>
     </resultMap>
 
     <select id="selectUserById" parameterType="java.lang.Long" resultMap="UserBaseMap">
@@ -22,7 +23,7 @@
         AND user_state = #{state}
     </select>
 
-    <select id="selectAllUser" resultMap="UserBaseMap">
+    <select id="userList" resultMap="UserBaseMap">
         SELECT * FROM t_user
     </select>
     <select id="login" resultMap="UserBaseMap">
@@ -30,6 +31,24 @@
         WHERE user_name = #{userName}
         AND user_pwd = #{userPwd}
     </select>
+    <select id="adminLogin" resultMap="UserBaseMap">
+        SELECT * FROM t_user
+        WHERE user_name = #{userName}
+        AND user_pwd = #{userPwd}
+        AND is_admin = 1
+    </select>
+    <select id="updateUser" resultMap="UserBaseMap">
+        UPDATE t_user set user_name = #{user.userName},user_phone = #{user.userPhone},
+        user_email = #{user.userEmail},is_admin = #{user.isAdmin}
+        WHERE id = #{user.id}
+    </select>
+    <delete id="delUser" >
+        delete from t_user where id=#{id}
+    </delete>
+    <insert id="addUser">
+        insert into t_user(user_name,user_pwd,user_phone,user_email,is_admin)
+        values (#{user.userName},#{user.userPwd},#{user.userPhone},#{user.userEmail},#{user.isAdmin})
+    </insert>
 
 
 </mapper>
