@@ -1,8 +1,10 @@
 package com.leezy.meet.controller;
 
 import com.leezy.meet.model.Meeting;
+import com.leezy.meet.model.Participate;
 import com.leezy.meet.model.User;
 import com.leezy.meet.service.MeetingService;
+import com.leezy.meet.service.ParticipateService;
 import com.leezy.meet.service.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +34,8 @@ public class UserController {
     private UserService userService;
     @Resource
     private MeetingService meetingService;
+    @Resource
+    private ParticipateService participateService;
 
     @RequestMapping("/login")
     public String login(HttpServletRequest request, User user){
@@ -52,13 +57,63 @@ public class UserController {
         return "redirect:/index.jsp";
     }
     @RequestMapping("/getNewMeetings")
-    public String getNewMeetings(ModelMap model) throws ParseException {
+    public String getNewMeetings(ModelMap model,HttpServletRequest request) throws ParseException {
         Date nowtime = new Date();
-        //SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        //Date time = df.parse(df.format(nowtime));
-        //log.info(df.format(nowtime));
         List<Meeting> meetings = meetingService.getNewMeetings(nowtime);
-        model.addAttribute("newMeetings", meetings);
+        HttpSession session = request.getSession();
+        User user = (User)session.getAttribute("currentUser");
+        List<Participate> list = participateService.getParticipated(user);
+        List<Meeting> ms = new ArrayList<Meeting>();
+        for (int i = 0; i < meetings.size(); i++) {
+            int k=0;
+            for (int j = 0; j < list.size(); j++) {
+                Meeting m = list.get(j).getMeeting();
+                if(meetings.get(i).getId()==m.getId()){
+                    k=1;
+                    break;
+                }
+            }
+            if(k==0){
+                ms.add(meetings.get(i));
+            }
+        }
+        model.addAttribute("newMeetings", ms);
         return "user/newMeetings";
+    }
+    @RequestMapping("/addParticipatePage")
+    public String addparticipatePage(Long id,ModelMap model){
+        Meeting meeting = meetingService.getMeetingById(id);
+        model.addAttribute("meeting",meeting);
+        return "user/addParticipate";
+    }
+    @RequestMapping("/addParticipate")
+    public String addParticipate(Long meeting_id,Participate participate,ModelMap model,HttpServletRequest request) throws ParseException {
+        HttpSession session = request.getSession();
+        User user = (User)session.getAttribute("currentUser");
+        log.info(user.getUserName());
+        Meeting meeting = meetingService.getMeetingById(meeting_id);
+        participate.setUser(user);
+        participate.setMeeting(meeting);
+        participateService.addParticipate(participate);
+        return getNewMeetings(model,request);
+    }
+    @RequestMapping("/getParticipated")
+    public String getParticipated(ModelMap model,HttpServletRequest request){
+        HttpSession session = request.getSession();
+        User user = (User)session.getAttribute("currentUser");
+        List<Participate> list = participateService.getParticipated(user);
+        List<Participate> expireList = new ArrayList<Participate>();
+        List<Participate> soonList = new ArrayList<Participate>();
+        for (int i = 0; i < list.size(); i++) {
+            Participate p = list.get(i);
+            if(p.getMeeting().getMeetStartTime().before(new Date())){
+                expireList.add(p);
+            }
+            else soonList.add(p);
+
+        }
+        model.addAttribute("soonList",soonList);
+        model.addAttribute("expireList",expireList);
+        return "user/participatedList";
     }
 }

@@ -1,6 +1,7 @@
 package com.leezy.meet.service;
 
 import com.leezy.meet.model.Meeting;
+import com.leezy.meet.model.Participate;
 import com.leezy.meet.model.User;
 
 import java.util.Date;
@@ -19,5 +20,6 @@ public interface UserService {
         Boolean delUser(Long id);
         Boolean addUser(User user);
         List<Meeting> getNewMeetings(Date nowtime);
+
 
 }

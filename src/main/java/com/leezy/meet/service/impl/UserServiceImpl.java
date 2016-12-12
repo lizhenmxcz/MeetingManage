@@ -1,8 +1,10 @@
 package com.leezy.meet.service.impl;
 
 import com.leezy.meet.dao.MeetingDao;
+import com.leezy.meet.dao.ParticipateDao;
 import com.leezy.meet.dao.UserDao;
 import com.leezy.meet.model.Meeting;
+import com.leezy.meet.model.Participate;
 import com.leezy.meet.model.User;
 import com.leezy.meet.service.UserService;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private UserDao userDao;
     @Resource
     private MeetingDao meetingDao;
+
 
     public User getUserById(Long userId) {
         return userDao.selectUserById(userId);
@@ -56,4 +59,5 @@ public class UserServiceImpl implements UserService {
     public List<Meeting> getNewMeetings(Date nowtime) {
         return meetingDao.getNewMeetings(nowtime);
     }
+
 }
